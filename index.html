@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Kitchen Recipe Helper</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Poppins, Arial, sans-serif;
+        background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+          url("https://images.unsplash.com/photo-1504674900247-0877df9cc836")
+            no-repeat center/cover;
+        min-height: 100vh;
+      }
+
+      header {
+        background: #ff7043;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        font-size: 30px;
+      }
+
+      .search-box {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px;
+        flex-wrap: wrap;
+      }
+
+      select,
+      button {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 6px;
+        border: none;
+      }
+
+      button {
+        background: #ff7043;
+        color: white;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #e64a19;
+      }
+
+      .menu {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        max-width: 1100px;
+        margin: auto;
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s;
+      }
+
+      .card:hover {
+        transform: scale(1.05);
+      }
+
+      .card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+      }
+
+      .card h3 {
+        margin: 0;
+        padding: 12px;
+        text-align: center;
+        color: #ff7043;
+      }
+
+      .recipe-box {
+        max-width: 800px;
+        background: white;
+        margin: 20px auto;
+        padding: 20px;
+        border-radius: 12px;
+        display: none;
+      }
+
+      .recipe-img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 10px;
+      }
+
+      .step {
+        background: #fff3e0;
+        padding: 8px;
+        margin-bottom: 6px;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>🍳 Kitchen Recipe Helper</header>
+
+    <div class="search-box">
+      <select id="cuisine" onchange="showMenu()">
+        <option value="">Select Cuisine</option>
+        <option value="indian">Indian</option>
+        <option value="punjabi">Punjabi</option>
+        <option value="italian">Italian</option>
+        <option value="french">French</option>
+        <option value="russian">Russian</option>
+      </select>
+    </div>
+
+    <div id="menu" class="menu"></div>
+    <div id="recipe" class="recipe-box"></div>
+
+    <script>
+      const recipes = {
+        indian: {
+          biryani: {
+            img: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8",
+            ingredients: ["Rice", "Chicken", "Spices"],
+            steps: ["Cook rice", "Cook chicken", "Dum cook"],
+          },
+          butterchicken: {
+            img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398",
+            ingredients: ["Chicken", "Tomato", "Butter"],
+            steps: ["Grill", "Make gravy", "Mix"],
+          },
+          paneertikka: {
+            img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46",
+            ingredients: ["Paneer", "Curd"],
+            steps: ["Marinate", "Grill"],
+          },
+          masaladosa: {
+            img: "https://images.unsplash.com/photo-1630383249896-424e482df921",
+            ingredients: ["Dosa batter", "Potato"],
+            steps: ["Prepare masala", "Cook dosa"],
+          },
+          pavbhaji: {
+            img: "https://images.unsplash.com/photo-1626132647523-66f5bf380027",
+            ingredients: ["Veggies", "Butter"],
+            steps: ["Mash", "Cook", "Serve"],
+          },
+        },
+        punjabi: {
+          sarson: {
+            img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398",
+            ingredients: ["Mustard leaves"],
+            steps: ["Cook", "Blend"],
+          },
+          makkiroti: {
+            img: "https://images.unsplash.com/photo-1601050690597-df0568f70950",
+            ingredients: ["Makki flour"],
+            steps: ["Knead", "Cook"],
+          },
+          lassi: {
+            img: "https://images.unsplash.com/photo-1599785209707-28c63f9c24e0",
+            ingredients: ["Curd", "Sugar"],
+            steps: ["Blend", "Serve"],
+          },
+        },
+        italian: {
+          pizza: {
+            img: "https://images.unsplash.com/photo-1548365328-5fbb7d6dc6f0",
+            ingredients: ["Base", "Cheese"],
+            steps: ["Bake"],
+          },
+          pasta: {
+            img: "https://images.unsplash.com/photo-1525755662778-989d0524087e",
+            ingredients: ["Pasta", "Sauce"],
+            steps: ["Boil", "Mix"],
+          },
+        },
+        french: {
+          croissant: {
+            img: "https://images.unsplash.com/photo-1548946526-f69e2424cf45",
+            ingredients: ["Flour", "Butter"],
+            steps: ["Bake"],
+          },
+          creme: {
+            img: "https://images.unsplash.com/photo-1551024506-0bccd828d307",
+            ingredients: ["Cream", "Sugar"],
+            steps: ["Bake", "Caramelize"],
+          },
+        },
+        russian: {
+          borscht: {
+            img: "https://images.unsplash.com/photo-1612198790700-0ff9fbbd7f2a",
+            ingredients: ["Beetroot", "Cabbage"],
+            steps: ["Boil", "Serve"],
+          },
+          pelmeni: {
+            img: "https://images.unsplash.com/photo-1611078489935-0cb964de46d9",
+            ingredients: ["Flour", "Meat"],
+            steps: ["Fill", "Boil"],
+          },
+        },
+      };
+
+      function showMenu() {
+        const cuisine = document.getElementById("cuisine").value;
+        const menu = document.getElementById("menu");
+        const recipeBox = document.getElementById("recipe");
+        menu.innerHTML = "";
+        recipeBox.style.display = "none";
+
+        if (!cuisine) return;
+
+        for (let item in recipes[cuisine]) {
+          menu.innerHTML += `
+<div class="card" onclick="showRecipe('${cuisine}','${item}')">
+<img src="${recipes[cuisine][item].img}">
+<h3>${item.toUpperCase()}</h3>
+</div>`;
+        }
+      }
+
+      function showRecipe(cuisine, item) {
+        const r = recipes[cuisine][item];
+        const box = document.getElementById("recipe");
+
+        let html = `<img src="${r.img}" class="recipe-img">
+<h2>${item.toUpperCase()}</h2>
+<h3>Ingredients</h3><ul>`;
+        r.ingredients.forEach((i) => (html += `<li>${i}</li>`));
+        html += `</ul><h3>Steps</h3>`;
+        r.steps.forEach(
+          (s, i) => (html += `<div class="step">${i + 1}. ${s}</div>`)
+        );
+
+        box.innerHTML = html;
+        box.style.display = "block";
+        window.scrollTo({ top: box.offsetTop, behavior: "smooth" });
+      }
+    </script>
+  </body>
+</html>
